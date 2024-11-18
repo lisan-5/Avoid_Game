@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avoid Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap'); /* Import Pacifico font */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap'); /* Import game-like font */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #000000, #00008B); /* Match start page background */
+            color: #ECF0F1; /* Light gray text */
+            font-family: 'Press Start 2P', cursive; /* Apply game-like font to all elements */
+        }
+        #container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between; /* Distribute space between elements */
+            align-items: center;
+            position: relative;
+            animation: fadeIn 1s ease-in-out, zoomIn 1s ease-in-out;
+            padding: 0; /* Remove padding */
+            box-sizing: border-box; /* Include padding in the element's total width and height */
+            flex-direction: row; /* Arrange elements horizontally */
+            background: linear-gradient(135deg, #000000, #00008B); /* Match start page background */
+            border: 10px solid #2C3E50; /* Add border to simulate a computer screen */
+            border-radius: 20px; /* Rounded corners */
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7); /* Enhanced shadow effect */
+        }
+        #gameCanvas {
+            display: none; /* Hide game canvas initially */
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            background: url('bac.jpg') no-repeat center center;
+            background-size: cover;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Shadow effect */
+            animation: glow 2s infinite alternate, slideIn 1s ease-in-out;
+            margin: 0; /* Remove margin */
+        }
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            }
+            to {
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            }
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        #highscores {
+            text-align: center;
+            margin-top: 20px;
+            display: none; /* Hide highscores section */
+        }
+        #descriptionBox {
+            display: block;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #000000, #00008B); /* Gradient background with black and dark blue */
+            color: #D3D3D3; /* Lighter gray text */
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px; /* Rounded corners */
+            animation: fadeIn 1s ease-in-out, slideIn 1s ease-in-out;
+            font-family: 'Press Start 2P', cursive; /* Add a game-like font */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Add shadow effect */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        #descriptionBox h2 {
+            font-size: 48px; /* Increase font size */
+            margin-bottom: 20px;
+            margin-top: 150px; /* Further increase margin-top to lower the title even more */
+            color: #FFD700; /* Gold color for the title */
+            text-shadow: 2px 2px #000000; /* Secondary color: black */
+            animation: bounce 1s infinite, colorChange 3s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+        @keyframes colorChange {
+            0%, 100% { color: #FFD700; }
+            50% { color: #FFA500; }
+        }
+        #descriptionBox p {
+            font-size: 24px; /* Increase font size */
+            margin-bottom: 20px;
+            color: #B0C4DE; /* Light steel blue */
+        }
+        #descriptionBox input {
+            padding: 15px; /* Increase padding */
+            font-size: 20px; /* Increase font size */
+            width: 80%;
+            max-width: 300px;
+            margin-bottom: 20px;
+            border-radius: 10px; /* Rounded corners */
+            border: 2px solid #4682B4; /* Steel blue */
+            transition: border-color 0.3s;
+            font-family: 'Press Start 2P', cursive; /* Apply game-like font to all elements */
+            animation: glowInput 2s infinite;
+        }
+        @keyframes glowInput {
+            0%, 100% { box-shadow: 0 0 5px #4682B4; }
+            50% { box-shadow: 0 0 15px #4682B4; }
+        }
+        #descriptionBox input:focus {
+            border-color: #B0C4DE; /* Light steel blue */
+            outline: none;
+        }
+        #descriptionBox ul {
+            list-style-type: none;
+            padding: 0;
+            font-size: 20px; /* Increase font size */
+            text-align: left;
+            display: inline-block;
+            color: #B0C4DE; /* Light steel blue */
+            font-family: 'Press Start 2P', cursive; /* Apply game-like font to all elements */
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            padding: 20px;
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Shadow effect */
+        }
+        #descriptionBox ul li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        #descriptionBox ul li:before {
+            content: "•"; /* Custom bullet point */
+            position: absolute;
+            left: 0;
+            color: #FFD700; /* Gold color for bullet points */
+            font-size: 24px;
+        }
+        #descriptionBox button {
+            padding: 25px 50px; /* Increase padding */
+            font-size: 28px; /* Increase font size */
+            margin-top: 20px;
+            background-color: #FFD700; /* Gold color for the button */
+            color: #2C3E50; /* Dark blue text */
+            border: none;
+            cursor: pointer;
+            border-radius: 10px; /* Rounded corners */
+            transition: background-color 0.3s, transform 0.3s;
+            font-family: 'Press Start 2P', cursive; /* Apply game-like font to all elements */
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        #descriptionBox button:hover {
+            background-color: #FFA500; /* Orange color on hover */
+            transform: scale(1.1);
+        }
+        #logo {
+            font-size: 60px; /* Increase font size */
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 2px solid #000000; /* Secondary color: black */
+            display: inline-block;
+            transition: background-color 0.3s, color 0.3s, transform 0.3s;
+            border-radius: 10px; /* Rounded corners */
+            font-family: 'Pacifico', cursive; /* Cursive font style */
+            background-color: #2C3E50; /* Set background to dark blue */
+            color: #ECF0F1; /* Light gray text */
+            position: absolute; /* Change to absolute */
+            top: 10px; /* Position at the top */
+            left: 10px; /* Position at the left */
+        }
+        #logo:hover {
+            background-color: #000000; /* Black */
+            color: #3498DB; /* Change text color to Light Blue on hover */
+            transform: rotate(360deg);
+        }
+        /* Style for the pause/resume button */
+        #pauseResumeButton {
+            position: absolute; /* Change to absolute */
+            top: 10px; /* Position at the top */
+            right: 10px; /* Position at the right */
+            z-index: 10;
+            padding: 25px; /* Increase padding */
+            font-size: 36px; /* Increase font size */
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 15px;
+            transition: background-color 0.3s, transform 0.3s;
+            display: none; /* Hide initially */
+            margin-bottom: 20px; /* Add space below the button */
+            animation: pulse 2s infinite;
+        }
+        #pauseResumeButton:hover {
+            background-color: darkred;
+            transform: scale(1.2);
+        }
+        /* Style when the button is in resume mode */
+        #pauseResumeButton.resume {
+            background-color: green;
+        }
+        #highscore {
+            font-size: 30px; /* Increase font size */
+            color: #ECF0F1; /* Light gray text */
+            text-shadow: 2px 2px 4px #000000;
+            animation: bounce 2s infinite;
+            margin-bottom: 20px; /* Add space below the highscore */
+            position: absolute; /* Change to absolute */
+            top: 10px; /* Adjust position */
+            left: 10px; /* Position at the left */
+            margin: 0; /* Remove margin */
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+        /* Style for the fullscreen, pause, and resume buttons */
+        .control-buttons {
+            text-align: center;
+            margin-top: 20px;
+            position: absolute; /* Change to absolute */
+            bottom: 10px; /* Position at the bottom */
+            left: 10px; /* Position at the left */
+        }
+        .control-buttons input[type="button"] {
+            padding: 15px 25px; /* Increase padding */
+            font-size: 24px; /* Increase font size */
+            margin: 5px;
+            background-color: #AED6F1; /* Light blue */
+            color: #2C3E50; /* Dark blue text */
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .control-buttons input[type="button"]:hover {
+            background-color: #3498DB; /* Light Blue on hover */
+            transform: scale(1.1);
+        }
+        #lives, #scoreMultiplier {
+            display: none; /* Hide lives and multiplier */
+        }
+        #footer {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px; /* Decrease font size */
+            color: #ECF0F1; /* Light gray text */
+            text-shadow: 1px 1px 2px #000000; /* Text shadow */
+        }
+        #score {
+            font-size: 30px; /* Increase font size */
+            color: #ECF0F1; /* Light gray text */
+            text-shadow: 2px 2px 4px #000000; /* Text shadow */
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px; /* Add space below the score */
+            position: absolute; /* Change to absolute */
+            top: 100px; /* Adjust position */
+            left: 10px; /* Position at the left */
+            margin: 0; /* Remove margin */
+            animation: fadeIn 1s ease-in-out;
+        }
+        #restartButton {
+            display: none; /* Hide initially */
+        }
+        #timer {
+            font-size: 30px; /* Increase font size */
+            color: #ECF0F1; /* Light gray text */
+            text-shadow: 2px 2px 4px #000000; /* Text shadow */
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px; /* Add space below the timer */
+            position: absolute; /* Change to absolute */
+            top: 40px; /* Adjust position */
+            left: 10px; /* Position at the left */
+            margin: 0; /* Remove margin */
+            animation: fadeIn 1s ease-in-out;
+        }
+        #scoreMultiplier {
+            font-size: 30px; /* Increase font size */
+            color: #ECF0F1; /* Light gray text */
+            text-shadow: 2px 2px 4px #000000; /* Text shadow */
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px; /* Add space below the score multiplier */
+            position: absolute; /* Change to absolute */
+            top: 70px; /* Adjust position */
+            left: 10px; /* Position at the left */
+            margin: 0; /* Remove margin */
+            animation: fadeIn 1s ease-in-out;
+        }
+        #topBar #pauseResumeButton {
+            font-size: 30px; /* Increase font size */
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        #topBar #pauseResumeButton:hover {
+            background-color: darkred;
+            transform: scale(1.1);
+        }
+        #topBar #scoreDisplay {
+            font-size: 30px; /* Increase font size */
+            color: #ECF0F1;
+            text-shadow: 2px 2px 4px #000000;
+        }
+        #gameOverScreen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ECF0F1;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 20;
+            animation: fadeIn 1s ease-in-out;
+            border-radius: 15px; /* Add rounded corners */
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7); /* Add shadow effect */
+        }
+        #gameOverScreen h2 {
+            font-size: 48px; /* Increase font size */
+            margin-bottom: 20px;
+            animation: slideDown 1s ease-out;
+            color: #FFD700; /* Gold color for the title */
+            text-shadow: 2px 2px #000000; /* Secondary color: black */
+        }
+        #gameOverScreen p {
+            font-size: 30px; /* Increase font size */
+            margin-bottom: 20px;
+            color: #B0C4DE; /* Light steel blue */
+        }
+        #gameOverScreen button {
+            padding: 15px 25px; /* Increase padding */
+            font-size: 24px; /* Increase font size */
+            background-color: #FFD700;
+            color: #2C3E50;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+            animation: bounceIn 1.5s ease;
+            margin-top: 10px; /* Add space above the button */
+        }
+        #gameOverScreen button:hover {
+            background-color: #FFA500;
+            transform: scale(1.1);
+        }
+        #gameOverScreen button.mainMenuButton {
+            background-color: #2ECC71; /* Green color */
+        }
+        #gameOverScreen button.mainMenuButton:hover {
+            background-color: #27AE60; /* Darker green on hover */
+        }
+        #gameOverScreen button.shareButton {
+            background-color: #3498DB; /* Light blue color */
+        }
+        #gameOverScreen button.shareButton:hover {
+            background-color: #2980B9; /* Darker blue on hover */
+        }
+        .power-up {
+            background-color: green;
+            width: 20px;
+            height: 20px;
+        }
+        .power-down {
+            background-color: red;
+            width: 20px;
+            height: 20px;
+        }
+        #gameOverScreen button.shareButton {
+            padding: 15px 25px; /* Increase padding */
+            font-size: 24px; /* Increase font size */
+            background-color: #3498DB; /* Light blue color */
+            color: #ECF0F1; /* Light gray text */
+            border: none;
+            cursor: pointer;
+            border-radius: 10px; /* Rounded corners */
+            transition: background-color 0.3s, transform 0.3s;
+            margin-top: 10px; /* Add space above the button */
+        }
+        #gameOverScreen button.shareButton:hover {
+            background-color: #2980B9; /* Darker blue on hover */
+            transform: scale(1.1);
+        }
+        #gameOverScreen button.mainMenuButton {
+            padding: 15px 25px; /* Increase padding */
+            font-size: 24px; /* Increase font size */
+            background-color: #2ECC71; /* Green color */
+            color: #ECF0F1; /* Light gray text */
+            border: none;
+            cursor: pointer;
+            border-radius: 10px; /* Rounded corners */
+            transition: background-color 0.3s, transform 0.3s;
+            margin-top: 10px; /* Add space above the button */
+        }
+        #gameOverScreen button.mainMenuButton:hover {
+            background-color: #27AE60; /* Darker green on hover */
+            transform: scale(1.1);
+        }
+        /* Hide score elements initially */
+        #score, #lives, #timer, #scoreMultiplier, #highscore {
+            display: none;
+        }
+        /* Position score elements relative to the container */
+        #timer, #scoreMultiplier, #score, #lives {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            /* Additional styling as needed */
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #F0C;
+            opacity: 0.7;
+            animation: falling 3s linear infinite;
+        }
+
+        @keyframes falling {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        .confetti.circle {
+            border-radius: 50%;
+        }
+
+        .confetti.triangle {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid #F0C;
+            background-color: transparent;
+        }
+
+        @keyframes fallingTriangle {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(720deg); }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+    <link rel="icon" type="image/png" href="boy.png">
+</head>
+<body>
+    <div>
+        <img src="boy.png" style="display: none;" id="scream"/>
+        <img src="restart.png" style="display: none;" id="restart"/>
+    </div>
+    <h3 style="text-align: center;">Avoid</h3>
+    <div id="highscore" style="text-align: center;">Highscore: 0 seconds</div>
+    <div id="container" style="text-align: center;padding-top:25px; position: relative;">
+        <!-- Move the pause/resume button inside the container -->
+        <canvas id="gameCanvas" width="800" height="500" style="border:1px solid #d3d3d3;">
+            Your browser does not support the HTML5 canvas tag.</canvas>
+        <button id="pauseResumeButton" onclick="togglePauseResume()">
+            &#9208; <!-- Pause icon -->
+        </button>
+        <!-- Add score elements inside the container -->
+        <div id="timer" style="display: none;">Time: 0 seconds</div>
+        <!-- <div id="scoreMultiplier" style="display: none;">Multiplier: x1</div> -->
+        <div id="score" style="display: none;">Score: 0 seconds</div>
+        <div id="lives" style="display: none;">Lives: 1</div>
+    </div>
+    <audio style="display: none;" autoplay="autoplay">
+        <source src="3D_Worldrunner_Main.mid" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div id="descriptionBox" style="display: block;">
+        <div id="logo">Ligator</div>
+        <h2>Welcome to The Avoid Game</h2>
+        <p>Enter your username:</p>
+        <input type="text" id="usernameInput" placeholder="Username">
+        <p>How to play:</p>
+        <ul>
+            <li>- Use arrow keys to move the player.</li>
+            <li>- Avoid the moving objects.</li>
+            <li>- Collect power-ups to gain advantages.</li>
+            <li>- Avoid power-downs that hinder your progress.</li>
+        </ul>
+        <br>
+        <button onclick="startGame()">START</button>
+        <div id="footer">©2024 Lisanegebriel Abay Kebedew. All Rights Reserved.</div>
+    </div>
+    <div id="gameOverScreen">
+        <h2>Game Over</h2>
+        <p id="finalScore">Your Score: 0 seconds</p>
+        <!-- Remove the Top 5 Highscores list from the game over screen -->
+        <p id="motivationalMessage"></p>
+        <p id="tipMessage"></p>
+        <button onclick="restartGame()">Play Again</button>
+        <button class="mainMenuButton" onclick="returnToMainMenu()">Return to Main Menu</button>
+    </div>
+    <script>
+        function showDescriptionBox() {
+            document.getElementById('descriptionBox').style.display = 'block';
+            document.getElementById('gameCanvas').style.display = 'none'; // Hide game canvas
+            document.getElementById('pauseResumeButton').style.display = 'none'; // Hide the button on the start page
+            // Hide score elements on the Welcome screen
+            document.getElementById('score').style.display = 'none';
+            document.getElementById('lives').style.display = 'none';
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('highscore').style.display = 'none';
+        }
+        function startGame() {
+            username = document.getElementById('usernameInput').value;
+            if (username == null || username == "") {
+                alert("Username cannot be empty.");
+                return;
+            }
+            document.getElementById("highscore").innerText = username + "'s Highscore: 0 seconds";
+            document.getElementById('descriptionBox').style.display = 'none';
+            document.getElementById('gameCanvas').style.display = 'block'; // Show game canvas
+            document.getElementById('score').style.display = 'block'; // Show score
+            document.getElementById('lives').style.display = 'block'; // Show lives
+            document.getElementById('timer').style.display = 'block'; // Show timer
+            document.getElementById('highscore').style.display = 'block'; // Show highscore
+            adjustCanvasSize(); // Adjust canvas size on game start
+            playAgain();
+        }
+
+        window.onload = showDescriptionBox;
+
+        var highscore = 0;
+        var highscores = JSON.parse(localStorage.getItem('highscores')) || [];
+
+        function updateHighscoreList() {
+            // Remove the highscore list update logic
+        }
+
+        function saveHighscore(username, score) {
+            highscores.push({username: username, score: score});
+            highscores.sort(function(a, b) { return b.score - a.score; });
+            highscores = highscores.slice(0, 5);
+            localStorage.setItem('highscores', JSON.stringify(highscores));
+        }
+
+        var gameLoop, enemyIncrementLoop, powerUpLoop;
+        var isPaused = false;
+        var startTime = 0;
+        var username = "";
+        var elem = document.getElementById("gameCanvas");
+        elem.addEventListener('webkitfullscreenchange', function(e) {
+            config.isFullScreen = (!config.isFullScreen);
+            if (config.isFullScreen) {
+                var elem = document.getElementById("gameCanvas");
+                elem.setAttribute("width", screen.width);
+                elem.setAttribute("height", screen.height);
+                container.width = screen.width;
+                container.height = screen.height;
+                config.font="30px arial";
+            } else {
+                var elem = document.getElementById("gameCanvas");
+                elem.setAttribute("width", 800);
+                elem.setAttribute("height", 500);
+                container.width = 800;
+                container.height = 500;
+                config.font="25px arial";
+            }
+        }, false);
+        var config = {isFullScreen: false,font:"25px arial",fontColor:"rgba(0,0,0,0.9)"};
+        function fullScreen() {
+            var elem = document.getElementById("gameCanvas");
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            }
+        }
+        function adjustCanvasSize() {
+            var canvas = document.getElementById("gameCanvas");
+            var containerEl = document.getElementById("container");
+            canvas.width = containerEl.clientWidth;
+            canvas.height = containerEl.clientHeight;
+            container.width = canvas.width;
+            container.height = canvas.height;
+        }
+
+        window.addEventListener('resize', adjustCanvasSize);
+        window.addEventListener('orientationchange', adjustCanvasSize);
+
+        function playAgain() {
+            lives = 1;
+            updateLives();
+            startTime = new Date();
+            gameLoop = setInterval(moveBalls, 20);
+            enemyIncrementLoop = setInterval(incrementEnemy, 4000); // Moderate enemy spawn rate
+            powerUpLoop = setInterval(spawnPowerUp, 8000); // Moderate power-up spawn rate
+            init();
+            document.getElementById('score').innerText = "Score: 0 seconds"; // Reset score
+            document.getElementById('lives').innerText = "Lives: 1"; // Reset lives
+            document.getElementById('timer').innerText = "Time: 0 seconds"; // Reset timer
+            document.getElementById('gameOverScreen').style.display = 'none'; // Hide game over screen
+            document.getElementById('gameCanvas').style.display = 'block'; // Show game canvas
+            $("#gameCanvas").attr("onclick", "");
+        }
+        function pauseGame() {
+            clearInterval(gameLoop);
+            clearInterval(enemyIncrementLoop);
+            clearInterval(powerUpLoop);
+            isPaused = true;
+        }
+        function resumeGame() {
+            if (isPaused) {
+                gameLoop = setInterval(moveBalls, 20);
+                enemyIncrementLoop = setInterval(incrementEnemy, 4000); // Moderate enemy spawn rate
+                powerUpLoop = setInterval(spawnPowerUp, 8000); // Moderate power-up spawn rate
+                isPaused = false;
+            }
+        }
+        function togglePauseResume() {
+            var button = document.getElementById("pauseResumeButton");
+            if (!isPaused) {
+                pauseGame();
+                button.innerHTML = '&#9654;'; // Play icon
+            } else {
+                resumeGame();
+                button.innerHTML = '&#9208;'; // Pause icon
+            }
+        }
+        function restartGame() {
+            clearInterval(gameLoop);
+            clearInterval(enemyIncrementLoop);
+            clearInterval(powerUpLoop);
+            playAgain();
+        }
+        function endGame() {
+            clearInterval(gameLoop);
+            clearInterval(enemyIncrementLoop);
+            clearInterval(powerUpLoop);
+            document.getElementById('gameCanvas').style.display = 'none'; // Hide game canvas
+            document.getElementById('gameOverScreen').style.display = 'block'; // Show game over screen
+            var score = Math.ceil((new Date() - startTime) / 1000);
+            if (score < 0) score *= -1;
+            document.getElementById('finalScore').innerText = "Your Score: " + score + " seconds";
+            saveHighscore(username, score);
+            // Display motivational message
+            document.getElementById('motivationalMessage').innerText = 'Great job, ' + username + '! Keep it up!';
+            // Display a random tip
+            displayRandomTip();
+            // Launch confetti effect
+            launchConfetti();
+        }
+
+        function displayRandomTip() {
+            const tips = [
+                'Tip: Collect power-ups to gain advantages.',
+                'Tip: Use arrow keys for precise movement.',
+                'Tip: Avoid enemies to survive longer.',
+                // ...additional tips...
+            ];
+            let previousTip = document.getElementById('tipMessage').innerText;
+            let randomTip;
+            do {
+                randomTip = tips[Math.floor(Math.random() * tips.length)];
+            } while (randomTip === previousTip);
+            document.getElementById('tipMessage').innerText = randomTip;
+        }
+
+        var container = {id: "container", width: 800, height: 500};
+        var player = {id: "player", x: container.width / 2, y: container.height - 50, width: 100, height: 160, speedX: 20, speedY: 5};
+        var objects;
+        var powerUps = [];
+        var lives = 1;
+
+        function updateLives() {
+            document.getElementById("lives").innerText = "Lives: " + lives;
+        }
+
+        function init() {
+            objects = [];
+            powerUps = [];
+            incrementEnemy();
+        }
+        function incrementEnemy() {
+            if (objects.length < 10) { // Moderate maximum number of enemies
+                var colors = ["purple", "black", "yellow", "blue", "brown", "orange", "gray"];
+                var color = colors[Math.floor(Math.random() * colors.length)];
+                var xPosition = container.width * Math.random();
+                var size = Math.ceil(Math.random() * 40) + 10;
+                var xSpeed = Math.ceil(Math.random() * 6) + 2; // Moderate enemy speed
+                var ySpeed = Math.ceil(Math.random() * 6) + 2; // Moderate enemy speed
+                if (xPosition <= 2 * size || xPosition + 2 * size >= container.width) {
+                    xPosition = container.width / 2;
+                }
+                objects.push({id: 'circle', size: size, speedX: xSpeed, speedY: ySpeed, color: color, centerX: xPosition, centerY: 80});
+            }
+        }
+
+        var powerUpEffects = {
+            'slowDown': {color: 'green', duration: 4000, effect: function() { adjustObjectSpeed(0.5); }},
+            'shrink': {color: 'green', duration: 4000, effect: function() { adjustObjectSize(0.5); }}
+        };
+
+        var powerDownEffects = {
+            'speedUp': {color: 'red', duration: 4000, effect: function() { adjustObjectSpeed(2); }},
+            'grow': {color: 'red', duration: 4000, effect: function() { adjustObjectSize(2); }}
+        };
+
+        function adjustObjectSpeed(factor) {
+            objects.forEach(function(object) {
+                object.speedX *= factor;
+                object.speedY *= factor;
+            });
+            setTimeout(function() {
+                objects.forEach(function(object) {
+                    object.speedX /= factor;
+                    object.speedY /= factor;
+                });
+            }, 4000);
+        }
+
+        function adjustObjectSize(factor) {
+            objects.forEach(function(object) {
+                object.size *= factor;
+            });
+            setTimeout(function() {
+                objects.forEach(function(object) {
+                    object.size /= factor;
+                });
+            }, 4000);
+        }
+
+        function spawnPowerUp() {
+            var types = Object.keys(powerUpEffects);
+            var type = types[Math.floor(Math.random() * types.length)];
+            var effect = powerUpEffects[type];
+            var xPosition = container.width * Math.random();
+            var yPosition = container.height * Math.random();
+            powerUps.push({type: type, color: effect.color, x: xPosition, y: yPosition, width: 20, height: 20});
+            spawnPowerDown(); // Ensure power-downs appear as frequently as power-ups
+        }
+
+        function spawnPowerDown() {
+            var types = Object.keys(powerDownEffects);
+            var type = types[Math.floor(Math.random() * types.length)];
+            var effect = powerDownEffects[type];
+            var xPosition = container.width * Math.random();
+            var yPosition = container.height * Math.random();
+            powerUps.push({type: type, color: effect.color, x: xPosition, y: yPosition, width: 20, height: 20});
+        }
+
+        function applyPowerUpEffect(type) {
+            var effect = powerUpEffects[type];
+            effect.effect();
+        }
+
+        function applyPowerDownEffect(type) {
+            var effect = powerDownEffects[type];
+            effect.effect();
+        }
+
+        var c = document.getElementById("gameCanvas");
+        var ctx = c.getContext("2d");
+        ctx.font = config.font;
+        ctx.fillText("Click Here To Start Game", container.width / 2 - 5 * 25, container.height / 2);
+        window.addEventListener("keydown", gamekeyboardlistener);
+        document.getElementById("gameCanvas").addEventListener("mousemove", gamemousemove);
+        mouseOffset = 1;
+        currentLoopCountOffset = 0;
+        function gamemousemove(event) {
+            if (currentLoopCountOffset == mouseOffset) {
+                currentLoopCountOffset = 0;
+                var rect = this.getBoundingClientRect();
+                var scaleX = this.width / rect.width;
+                var scaleY = this.height / rect.height;
+                var mouseX = (event.clientX - rect.left) * scaleX;
+                var mouseY = (event.clientY - rect.top) * scaleY;
+                player.x = mouseX - player.width / 2; // Center player
+                player.y = mouseY - player.height / 2; // Center player
+                // Keep player within bounds
+                player.x = Math.max(0, Math.min(player.x, container.width - player.width));
+                player.y = Math.max(0, Math.min(player.y, container.height - player.height));
+            }
+            currentLoopCountOffset++;
+        }
+
+        function gametouchmove(event) {
+            event.preventDefault(); // Prevent scrolling
+            var touch = event.touches[0];
+            var rect = this.getBoundingClientRect();
+            var scaleX = this.width / rect.width;
+            var scaleY = this.height / rect.height;
+            var touchX = (touch.clientX - rect.left) * scaleX;
+            var touchY = (touch.clientY - rect.top) * scaleY;
+            player.x = touchX - player.width / 2; // Center player
+            player.y = touchY - player.height / 2;
+            // Keep player within bounds
+            player.x = Math.max(0, Math.min(player.x, container.width - player.width));
+            player.y = Math.max(0, Math.min(player.y, container.height - player.height));
+        }
+
+        var canvas = document.getElementById("gameCanvas");
+        canvas.addEventListener("mousemove", gamemousemove);
+        canvas.addEventListener("touchmove", gametouchmove, { passive: false });
+
+        function gamekeyboardlistener(event) {
+            if (event.keyCode == 37) { // Left arrow key
+                if (player.x - player.speedX >= 0) player.x -= player.speedX;
+            }
+            if (event.keyCode == 38) { // Up arrow key
+                if (player.y - player.speedY >= 0) player.y -= player.speedY;
+            }
+            if (event.keyCode == 39) { // Right arrow key
+                if (player.x + player.width + player.speedX <= container.width) player.x += player.speedX;
+            }
+            if (event.keyCode == 40) { // Down arrow key
+                if (player.y + player.height + player.speedY <= container.height) player.y += player.speedY;
+            }
+            // Center the image based on its width and height
+            player.x = Math.max(0, Math.min(player.x, container.width - player.width));
+            player.y = Math.max(0, Math.min(player.y, container.height - player.height));
+        }
+
+        function moveBalls() {
+            var c = document.getElementById("gameCanvas");
+            var ctx = c.getContext("2d");
+            ctx.clearRect(0, 0, c.width, c.height); // Clear the entire canvas
+            for (i in objects) {
+                var object = objects[i];
+                if (
+                        (object.centerY + object.size * 0.75 >= player.y && object.centerY + object.size * 0.75 <= player.y + player.height)
+                        ||
+                        (object.centerY - object.size * 0.75 >= player.y && object.centerY - object.size * 0.75 <= player.y + player.height)
+                        ) {
+                    if (
+                            (object.centerX + object.size * 0.75 > player.x && object.centerX + object.size * 0.75 < player.x + player.width)
+                            ||
+                            (object.centerX - object.size * 0.75 > player.x && object.centerX - object.size * 0.75 < player.x + player.width)
+
+                            ) {
+                        if (!player.invincible && !player.shielded) {
+                            lives--;
+                            updateLives();
+                        }
+                        if (lives <= 0) {
+                            endGame();
+                        } else {
+                            objects.splice(i, 1); // Remove the object that hit the player
+                        }
+                    }
+                }
+                if (object.centerX + object.size > c.width || object.centerX - object.size < 0) {
+                    object.speedX *= -1;
+                }
+                if (object.centerY + object.size > c.height || object.centerY - object.size < 0) {
+                    object.speedY *= -1;
+                }
+                ctx.beginPath();
+                ctx.fillStyle = object.color;
+                ctx.arc(object.centerX, object.centerY, object.size, 0, 2 * Math.PI);
+                ctx.fill();
+                object.centerX += object.speedX;
+                object.centerY += object.speedY;
+            }
+            for (var i in powerUps) {
+                var powerUp = powerUps[i];
+                ctx.fillStyle = powerUp.color;
+                ctx.fillRect(powerUp.x - powerUp.width / 2, powerUp.y - powerUp.height / 2, powerUp.width, powerUp.height);
+                if (player.x < powerUp.x + powerUp.width / 2 &&
+                    player.x + player.width > powerUp.x - powerUp.width / 2 &&
+                    player.y < powerUp.y + powerUp.height / 2 &&
+                    player.y + player.height > powerUp.y - powerUp.height / 2) {
+                    if (powerUp.type in powerUpEffects) {
+                        applyPowerUpEffect(powerUp.type);
+                    } else {
+                        applyPowerDownEffect(powerUp.type);
+                    }
+                    powerUps.splice(i, 1);
+                }
+            }
+            var img = document.getElementById("scream");
+            ctx.drawImage(img, player.x, player.y, player.width, player.height);
+            ctx.font = config.font;
+            ctx.fillStyle = config.fontColor;
+            var elapsedTime = Math.ceil((new Date() - startTime) / 1000);
+            ctx.fillText("Sec : " + elapsedTime, c.width * 0.8, 40);
+            document.getElementById('score').innerText = "Score: " + elapsedTime + " seconds"; // Update score
+            document.getElementById('timer').innerText = "Time: " + elapsedTime + " seconds"; // Update timer
+            
+            // Apply blink animation every 10 seconds
+            if (elapsedTime % 10 === 0) {
+                document.getElementById('score').style.animation = 'blink 1s infinite';
+            } else {
+                document.getElementById('score').style.animation = 'none';
+            }
+        }
+
+        function returnToMainMenu() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('descriptionBox').style.display = 'block';
+            document.getElementById('gameCanvas').style.display = 'none';
+            document.getElementById('score').style.display = 'none';
+            document.getElementById('lives').style.display = 'none';
+            document.getElementById('restartButton').style.display = 'none';
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('scoreMultiplier').style.display = 'none';
+        }
+
+        var canvas = document.getElementById("gameCanvas");
+
+        // Remove the existing onclick attribute from the canvas element in the HTML.
+
+        // Add an event listener for right-click to toggle pause/resume
+        canvas.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+            togglePauseResume();
+        }, false);
+
+        // Add an event listener for left-click to toggle pause/resume
+        canvas.addEventListener('click', function(event) {
+            event.preventDefault();
+            togglePauseResume();
+        }, false);
+    </script>
+</body>
+</html>
