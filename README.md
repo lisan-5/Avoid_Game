@@ -40,3 +40,9 @@ In this game, you control a player character that must avoid moving objects whil
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+Contact
+If you have any questions or would like to get in touch, feel free to contact me:
+
+Email: lisan5abay@gmail.com
+Telegram: @ligator
