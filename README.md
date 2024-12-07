@@ -33,7 +33,7 @@ In this game, you control a player character that must avoid moving objects whil
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/lisanx/avoid-game.git
+    git clone https://github.com/lisan-5/Avoid_Game.git
     ```
 2. Open the `code/saveme.html` file in your web browser to start the game.
 
